@@ -23,27 +23,27 @@ jobs:
     - name: Configure AWS credentials
       uses: aws-actions/configure-aws-credentials@v1
       with:
-        ## ARN from tf/build module output
+        ## ARN from tf/modules/build output
         role-to-assume: arn:aws:iam::832855882461:role/github-jmanero-ubiquitous-guacamole
         aws-region: us-east-1
 
-    - name: Login to Amazon ECR Private
+    - name: Login to Amazon ECR
       id: login
       uses: aws-actions/amazon-ecr-login@v1
-      # with:
-      #   registry-type: public
+      with:
+        registry-type: public
 
     - name: Build Image
       id: build
       uses: redhat-actions/buildah-build@v2
       with:
-        ## Repository created by tf/build module
+        ## Repository created by tf/modules/build
         image: functions/ubiquitous-guacamole
-        tags: latest ${{ github.sha }}
+        tags: latest 0.0.1+${{ github.sha }}
         context: .
         containerfiles: Containerfile
 
-    - name: Push bitcoind Image to Registry
+    - name: Push Image to ECR
       id: push
       uses: redhat-actions/push-to-registry@v2
       with:
