@@ -39,9 +39,12 @@ jobs:
       with:
         ## Repository created by tf/modules/build
         image: functions/ubiquitous-guacamole
-        tags: latest 0.0.1+${{ github.sha }}
+        tags: latest 0.0.1-git.${{ github.sha }}
         context: .
         containerfiles: Containerfile
+        labels: |-
+          org.label-schema.vcs-url=${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }}
+          org.label-schema.vcs-ref=${{ github.sha }}
 
     - name: Push Image to ECR
       id: push
