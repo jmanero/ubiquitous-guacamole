@@ -19,9 +19,9 @@ resource "aws_cloudwatch_log_group" "function" {
 
 ## Create an IAM role and policy for the Lambda function
 resource "aws_iam_role" "function" {
-  name = "function-" + var.app_name
+  name = "function-${var.app_name}"
 
-  description = "Role for ${var.app_name} lambda function"
+  description        = "Role for ${var.app_name} lambda function"
   assume_role_policy = <<EOF
 {
   "Version": "2012-10-17",
@@ -39,7 +39,7 @@ EOF
 }
 
 resource "aws_iam_policy" "function" {
-  name        = "function-" + var.app_name
+  name        = "function-${var.app_name}"
   path        = "/"
   description = "Policy for ${var.app_name} lambda function"
 
@@ -65,11 +65,6 @@ resource "aws_iam_policy" "function" {
   ]
 }
 EOF
-
-  depends_on = [
-    aws_s3_bucket.state,
-    aws_cloudwatch_log_group.function,
-  ]
 }
 
 resource "aws_iam_role_policy_attachment" "function" {

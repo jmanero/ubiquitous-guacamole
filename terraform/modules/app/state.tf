@@ -1,5 +1,5 @@
 ##
-## Contains S3, CloudWatch Logs, and IAM resources for the application
+## Contains S3 resources for the application
 ##
 
 ## Configure the application's state-storage bucket and access policy

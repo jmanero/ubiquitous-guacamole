@@ -11,6 +11,7 @@ on:
 permissions:
   contents: read
   id-token: write
+  packages: write
 
 jobs:
   image:
@@ -30,8 +31,6 @@ jobs:
     - name: Login to Amazon ECR
       id: login
       uses: aws-actions/amazon-ecr-login@v1
-      with:
-        registry-type: public
 
     - name: Build Image
       id: build
@@ -54,4 +53,14 @@ jobs:
         tags: ${{ steps.build.outputs.tags }}
         ## Registry for AWS account
         ## TODO: Apply build module in this workflow to get outputs
-        registry: public.ecr.aws/r2g9b1i0
+        registry: 832855882461.dkr.ecr.us-east-1.amazonaws.com
+
+    - name: Push Image to GitHub Packages
+      id: push
+      uses: redhat-actions/push-to-registry@v2
+      with:
+        image: ${{ steps.build.outputs.image }}
+        tags: ${{ steps.build.outputs.tags }}
+        registry: ghcr.io/jmanero
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}

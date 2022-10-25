@@ -3,20 +3,20 @@
 ##
 
 ## Create an ECR repository for lambda images
-resource "aws_ecrpublic_repository" "function" {
-  repository_name = var.ecr_repo
-  catalog_data {
-    architectures = [ "x86-64" ]
-    operating_systems = [ "Linux" ]
-    description = "Container images for ubiquitous-guacamole function invocations"
+resource "aws_ecr_repository" "function" {
+  name                 = var.ecr_repo
+  image_tag_mutability = "MUTABLE"
+
+  image_scanning_configuration {
+    scan_on_push = true
   }
 }
 
 ## Create an OIDC provider for GitHub
 resource "aws_iam_openid_connect_provider" "github" {
-  url = "https://token.actions.githubusercontent.com"
-  client_id_list = [ "sts.amazonaws.com" ]
-  thumbprint_list = [ "6938fd4d98bab03faadb97b34396831e3780aea1" ]
+  url             = "https://token.actions.githubusercontent.com"
+  client_id_list  = ["sts.amazonaws.com"]
+  thumbprint_list = ["6938fd4d98bab03faadb97b34396831e3780aea1"]
 }
 
 ## Create an IAM role and policy for GitHub Actions to push to ECR
@@ -28,7 +28,7 @@ resource "aws_iam_role" "github" {
     Version = "2012-10-17",
     Statement = [
       {
-        Action = [ "sts:AssumeRoleWithWebIdentity" ],
+        Action = ["sts:AssumeRoleWithWebIdentity"],
         Effect = "Allow",
         Principal = {
           Federated = aws_iam_openid_connect_provider.github.arn
@@ -48,7 +48,7 @@ resource "aws_iam_role" "github" {
 }
 
 resource "aws_iam_policy" "github" {
-  name = join("-", ["github", var.github_org, var.github_repo])
+  name        = join("-", ["github", var.github_org, var.github_repo])
   path        = "/"
   description = "Policy for GitHub Actions to push container-images to ECR"
 
@@ -57,22 +57,23 @@ resource "aws_iam_policy" "github" {
     Statement = [
       {
         Action = [
-          "ecr-public:GetAuthorizationToken",
-          "sts:GetServiceBearerToken"
+          "ecr:GetAuthorizationToken",
         ],
-        Effect = "Allow",
+        Effect   = "Allow",
         Resource = "*",
       },
       {
         Action = [
-          "ecr-public:BatchCheckLayerAvailability",
-          "ecr-public:CompleteLayerUpload",
-          "ecr-public:InitiateLayerUpload",
-          "ecr-public:PutImage",
-          "ecr-public:UploadLayerPart"
+          "ecr:BatchGetImage",
+          "ecr:BatchCheckLayerAvailability",
+          "ecr:CompleteLayerUpload",
+          "ecr:GetDownloadUrlForLayer",
+          "ecr:InitiateLayerUpload",
+          "ecr:PutImage",
+          "ecr:UploadLayerPart"
         ],
-        Effect = "Allow",
-        Resource = aws_ecrpublic_repository.function.arn,
+        Effect   = "Allow",
+        Resource = aws_ecr_repository.function.arn,
       }
     ],
   })
