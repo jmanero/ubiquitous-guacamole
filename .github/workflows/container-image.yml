@@ -52,4 +52,6 @@ jobs:
       with:
         image: ${{ steps.build.outputs.image }}
         tags: ${{ steps.build.outputs.tags }}
-        registry: ${{ steps.login.outputs.registry }}
+        ## Registry for AWS account
+        ## TODO: Apply build module in this workflow to get outputs
+        registry: public.ecr.aws/r2g9b1i0
