@@ -56,19 +56,20 @@ resource "aws_iam_policy" "github" {
     Version = "2012-10-17",
     Statement = [
       {
-        Action = [ "ecr:GetAuthorizationToken" ],
+        Action = [
+          "ecr-public:GetAuthorizationToken",
+          "sts:GetServiceBearerToken"
+        ],
         Effect = "Allow",
         Resource = "*",
       },
       {
         Action = [
-          "ecr:BatchGetImage",
-          "ecr:BatchCheckLayerAvailability",
-          "ecr:CompleteLayerUpload",
-          "ecr:GetDownloadUrlForLayer",
-          "ecr:InitiateLayerUpload",
-          "ecr:PutImage",
-          "ecr:UploadLayerPart"
+          "ecr-public:BatchCheckLayerAvailability",
+          "ecr-public:CompleteLayerUpload",
+          "ecr-public:InitiateLayerUpload",
+          "ecr-public:PutImage",
+          "ecr-public:UploadLayerPart"
         ],
         Effect = "Allow",
         Resource = aws_ecrpublic_repository.function.arn,
